@@ -1,0 +1,34 @@
+# Contributor: k0r10n <k0r10n.dev@gmail.com>
+# Maintainer:
+pkgname=0ad-data
+pkgver=a18
+pkgrel=0
+pkgdesc="Cross-platform, 3D and historically-based real-time strategy game (data files)"
+url="http://play0ad.com/"
+arch="all"
+license="GPL2"
+depends=""
+depends_dev=""
+makedepends="$depends_dev"
+install=""
+subpackages=""
+source="http://sourceforge.net/projects/zero-ad/files/releases/0ad-0.0.18-alpha-unix-data.tar.xz"
+
+_builddir=$srcdir/0ad-0.0.18-alpha
+prepare() {
+	return 0
+}
+
+build() {
+	return 0
+}
+
+package() {
+	cd "$_builddir"
+	install -d ${pkgdir}/usr/share/0ad/data || return 1
+	cp -r binaries/data ${pkgdir}/usr/share/0ad || return 1
+}
+
+md5sums="6241055b103f72963df8ac18795c5eb2  0ad-0.0.18-alpha-unix-data.tar.xz"
+sha256sums="b1a4078eb945ac873accb45c831dbe988866e3559d16bea189eb439c2c71ac44  0ad-0.0.18-alpha-unix-data.tar.xz"
+sha512sums="581b6774ff42b130152acb057028584816b6194fb24ad98b2e384f1193afb0468f4e336e00834703dbe83477176be4f0ce423a5bae8343c266d5a066932bd8d6  0ad-0.0.18-alpha-unix-data.tar.xz"
