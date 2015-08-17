@@ -1,0 +1,20 @@
+--- a/src/connectiontcpserver.cpp.orig
++++ b/src/connectiontcpserver.cpp
+@@ -50,6 +50,7 @@
+ 
+ #include <cstdlib>
+ #include <string>
++#include <string.h>
+ 
+ #ifndef _WIN32_WCE
+ # include <sys/types.h>
+--- a/src/dns.cpp.orig
++++ b/src/dns.cpp
+@@ -22,6 +22,7 @@
+ #endif
+ 
+ #include <stdio.h>
++#include <string.h>
+ 
+ #if ( !defined( _WIN32 ) && !defined( _WIN32_WCE ) ) || defined( __SYMBIAN32__ )
+ # include <netinet/in.h>
