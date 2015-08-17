@@ -1,0 +1,85 @@
+# Contributor: k0r10n <k0r10n.dev@gmail.com>
+# Maintainer:
+pkgname=0ad
+pkgver=a18
+pkgrel=0
+pkgdesc="Cross-platform, 3D and historically-based real-time stratagy game"
+url="http://play0ad.com/"
+arch="all"
+license="GPL2"
+depends="0ad-data"
+depends_dev="wxgtk2.8-dev nspr-dev boost-dev enet-dev
+	     miniupnpc-dev gloox-dev icu-dev mesa-dev
+	     sdl-dev curl-dev openal-soft-dev libvorbis-dev
+	     libxcursor-dev"
+makedepends="$depends_dev cmake python boost
+	     bash bsd-compat-headers paxmark"
+install=""
+subpackages=""
+source="https://sourceforge.net/projects/zero-ad/files/releases/${pkgname}-0.0.18-alpha-unix-build.tar.xz
+	execinfo_backtrace.patch
+	fix_strerror_r.patch
+	nvtt_nvmath_isnanf.patch"
+
+_builddir=$srcdir/${pkgname}-0.0.18-alpha
+prepare() {
+	local i
+	cd "$_builddir"
+	for i in $source; do
+		case $i in
+		*.patch) msg $i; patch -p1 -i "$srcdir"/$i || return 1;;
+		esac
+	done
+}
+
+build() {
+	cd "$_builddir"/build/workspaces
+	# We don't need editing tools (error while compiling in Canvas.h)
+	# Redefining JOBS because update-workspaces.sh has own JOBS like -j2
+	export JOBS="-j$JOBS"
+	./update-workspaces.sh \
+		--disable-atlas \
+		--bindir=/usr/bin \
+		--libdir=/usr/lib/0ad \
+		--datadir=/usr/share/0ad/data || return 1
+	# Fixing spidermonkey version
+	sed -i -e 's/31\.2\.0esr/31/g' "$_builddir"/libraries/source/spidermonkey/include-unix-release/js-config.h || return 1
+	cd "$_builddir"/build/workspaces/gcc
+	make || return 1
+}
+
+package() {
+	cd "$_builddir"
+	for dir in bin lib/0ad share/0ad/data;do
+		install -d "${pkgdir}"/usr/$dir || return 1
+	done
+	# To avoid out of memory errors
+	paxmark -m binaries/system/pyrogenesis || return 1
+	install -Dm755 binaries/system/pyrogenesis \
+		"${pkgdir}/usr/bin" || return 1
+	install -Dm755 binaries/system/*.so \
+		"${pkgdir}/usr/lib/0ad" || return 1
+
+	cp -r binaries/data/l10n/ \
+		${pkgdir}/usr/share/${pkgname}/data/ || return 1
+
+	install -Dm755 build/resources/${pkgname}.sh \
+		"${pkgdir}/usr/bin/${pkgname}" || return 1
+	install -Dm755 build/resources/${pkgname}.desktop \
+		"${pkgdir}/usr/share/applications/${pkgname}.desktop" || return 1
+	install -Dm755 build/resources/${pkgname}.png \
+		"${pkgdir}/usr/share/pixmaps/${pkgname}.png" || return 1
+}
+
+md5sums="84aedae3ab86955f87c55607600daa12  0ad-0.0.18-alpha-unix-build.tar.xz
+c4a44d8c98933d15c9ff3fb143a53e41  execinfo_backtrace.patch
+bb64df41f3b2fcf212c9287ce387235a  fix_strerror_r.patch
+ad6ac84bbcd682dd1423712e60c69ab5  nvtt_nvmath_isnanf.patch"
+sha256sums="bd2f04d3269ae9af104626827446a89ea4a0dd4859f89539701fd331cbae0397  0ad-0.0.18-alpha-unix-build.tar.xz
+24e1d700f3e12ee90c70ebd88b5cfb3d7a8414c5b68618bf9ef4396819d1c9c4  execinfo_backtrace.patch
+b66ed6c4fdc893095039d28a8c72a8b0af5d2bbbd65080f648d04642406541f7  fix_strerror_r.patch
+b24b427711d1b8d595fb6b60357a2e6707a3b5fe021b91f20bc8c22c865ba0fd  nvtt_nvmath_isnanf.patch"
+sha512sums="f332780d38e3fc2665a5952ae9cd25ab89508b3b27d810cf1b386d6c6d636aeed306135c37baf6232ba8c0d0e7923ecb0b4fc127a6de5ce1248dfc38158e0c41  0ad-0.0.18-alpha-unix-build.tar.xz
+237e5200d6267805458b04b9dfa2315b69aa551dbf6b3c765fea12578e2dfe67889cba8b4f568e2341079b62bacfe8a914a8a40455bfec9fee4074931e26f58b  execinfo_backtrace.patch
+82f5e2664622111b8d5d6b6172a5f37c29a876accb43b358452670acd5eafb2f670e9af8ba884135e704b3bd05c17715c042bb65e79ed9bea3506bce30572a75  fix_strerror_r.patch
+2237e8363924d3cbf30427e712f196fecd5f3fcd7eff2f0812cf188f1de67398e2cb3b3567579904d8f8867f83914a0303e2c9a8af903c528673efa7435bd32f  nvtt_nvmath_isnanf.patch"

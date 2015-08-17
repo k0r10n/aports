@@ -1,0 +1,21 @@
+--- a/source/lib/sysdep/os/linux/ldbg.cpp.orig
++++ b/source/lib/sysdep/os/linux/ldbg.cpp
+@@ -33,7 +33,7 @@
+ #include "lib/sysdep/sysdep.h"
+ #include "lib/debug.h"
+ 
+-#if OS_ANDROID
++#if OS_ANDROID || !defined(__GLIBC__)
+ 
+ // Android NDK doesn't support backtrace()
+ // TODO: use unwind.h or similar?
+@@ -55,7 +55,9 @@
+ 
+ #else
+ 
++#if defined(__GLIBC__)
+ #include <execinfo.h>
++#endif
+ 
+ void* debug_GetCaller(void* UNUSED(context), const wchar_t* UNUSED(lastFuncToSkip))
+ {

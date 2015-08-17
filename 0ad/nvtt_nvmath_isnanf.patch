@@ -1,0 +1,11 @@
+--- a/libraries/source/nvtt/src/src/nvmath/nvmath.h.orig
++++ b/libraries/source/nvtt/src/src/nvmath/nvmath.h
+@@ -133,7 +133,7 @@
+ #elif NV_OS_DARWIN || NV_OS_FREEBSD || NV_OS_OPENBSD
+ 	return isnan(f);
+ #elif NV_OS_LINUX
+-	return isnanf(f);
++	return isnan(f);
+ #else
+ #	error "isNan not supported"
+ #endif
